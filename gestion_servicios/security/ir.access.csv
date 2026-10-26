@@ -1,0 +1,3 @@
+id,name,model_id,group_id/id,operation,domain
+access_servicio_inspeccion_user,servicio.inspeccion.user,servicio.inspeccion,base.group_user,crud,
+access_servicio_inspeccion_item_user,servicio.inspeccion.item.user,servicio.inspeccion.item,base.group_user,crud,

@@ -21,10 +21,10 @@
             <form string="Inspección de servicio">
                 <header>
                     <button name="action_previous_section" type="object"
-                            string="Anterior" icon="fa-chevron-left"
+                            string="Anterior" icon="arrow_back"
                             invisible="section == 'detail'"/>
                     <button name="action_next_section" type="object"
-                            string="Siguiente" icon="fa-chevron-right"
+                            string="Siguiente" icon="arrow_forward"
                             class="btn-primary"
                             invisible="section == 'received_by'"/>
                     <button name="action_start_inspection" type="object"
@@ -34,10 +34,10 @@
                             string="Completar inspección" class="btn-success"
                             invisible="section != 'received_by' or state == 'done'"/>
                     <button name="action_download_report" type="object"
-                            string="Descargar PDF" icon="fa-download" class="btn-primary"
+                            string="Descargar PDF" icon="download" class="btn-primary"
                             invisible="state != 'done'"/>
                     <button name="action_send_email" type="object"
-                            string="Enviar por correo" icon="fa-envelope" class="btn-primary"
+                            string="Enviar por correo" icon="mail" class="btn-primary"
                             invisible="state != 'done'"/>
                     <field name="state" widget="statusbar"/>
                 </header>

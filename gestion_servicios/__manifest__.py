@@ -1,6 +1,6 @@
 {
     "name": "Gestión de Inspecciones y Servicios",
-    "version": "18.0.1.2.0",
+    "version": "20.0.1.0.0",
     "summary": "Reportes de inspección y mantenimiento de equipos",
     "description": """
         Gestión de reportes de inspección de sistemas contra incendio,
@@ -11,7 +11,7 @@
     "license": "LGPL-3",
     "depends": ["base", "web", "mail"],
     "data": [
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "data/sequence.xml",
         "views/inspeccion_views.xml",
         "report/inspeccion_report.xml",

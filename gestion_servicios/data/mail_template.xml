@@ -5,6 +5,7 @@
         <field name="model_id" ref="model_servicio_inspeccion"/>
         <field name="subject">Reporte de inspección {{ object.name }}</field>
         <field name="email_from">{{ (object.technician_id.email_formatted or user.email_formatted) }}</field>
+        <field name="use_default_to" eval="False"/>
         <field name="partner_to">{{ object.customer_id.id }}</field>
         <field name="report_template_ids" eval="[(4, ref('gestion_servicios.action_report_inspeccion'))]"/>
         <field name="lang">{{ object.customer_id.lang }}</field>

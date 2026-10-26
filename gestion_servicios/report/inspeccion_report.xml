@@ -19,7 +19,6 @@
         <field name="model">servicio.inspeccion</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">gestion_servicios.report_inspeccion_document</field>
-        <field name="report_file">gestion_servicios.report_inspeccion_document</field>
         <field name="print_report_name">'Inspeccion-%s' % (object.name or 'reporte')</field>
         <field name="paperformat_id" ref="paperformat_inspeccion"/>
     </record>

@@ -3,7 +3,7 @@ import os
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
-from odoo.tools import image_process
+from odoo.tools.image import image_process
 from odoo.tools.mimetypes import guess_mimetype
 
 
@@ -709,9 +709,7 @@ class ReportInspeccion(models.AbstractModel):
                 cache[attachment.id] = _image_uri(attachment)
             return cache[attachment.id]
 
-        base_url = (
-            self.env["ir.config_parameter"].sudo().get_param("web.base.url") or ""
-        ).rstrip("/")
+        base_url = self.get_base_url().rstrip("/")
 
         def photo_url(attachment):
             """Enlace a la foto completa; el token permite abrirla sin iniciar sesión."""
