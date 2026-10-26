@@ -3,6 +3,7 @@ import os
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.tools.binary import BinaryBytes
 from odoo.tools.image import image_process
 from odoo.tools.mimetypes import guess_mimetype
 
@@ -673,7 +674,7 @@ def _is_image(attachment):
 def _image_uri(attachment):
     """Imagen incrustada y reducida (máx. 1600 px) para que el PDF no pese de más."""
     att = attachment.sudo()
-    raw = att.raw
+    raw = bytes(att.raw or b"")
     if not raw:
         return ""
     mimetype = att.mimetype or "image/png"
@@ -688,11 +689,10 @@ def _image_uri(attachment):
 
 
 def _signature_uri(value):
+    """En Odoo 20 los campos binarios ya traen el contenido (bytes), no base64."""
     if not value:
         return ""
-    if isinstance(value, bytes):
-        value = value.decode()
-    return "data:image/png;base64," + value
+    return "data:image/png;base64," + base64.b64encode(bytes(value)).decode()
 
 
 class ReportInspeccion(models.AbstractModel):
@@ -766,28 +766,40 @@ def _compress_image(raw):
 class IrAttachment(models.Model):
     _inherit = "ir.attachment"
 
+    @staticmethod
+    def _compress_vals(vals, raw):
+        """Comprime la foto de `raw` y ajusta `vals`. Devuelve False si no aplica."""
+        if vals.get("res_model") not in _COMPRESS_MODELS or not raw:
+            return False
+        raw = bytes(raw)
+        mimetype = vals.get("mimetype") or guess_mimetype(raw)
+        if mimetype not in ("image/jpeg", "image/png", "image/webp"):
+            return False  # videos, PDF, etc. no se tocan
+        new_raw = _compress_image(raw)
+        if new_raw is raw:
+            return False
+        vals["raw"] = BinaryBytes(new_raw)
+        vals["mimetype"] = "image/jpeg"
+        if vals.get("name"):
+            vals["name"] = os.path.splitext(vals["name"])[0] + ".jpg"
+        return True
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get("res_model") not in _COMPRESS_MODELS:
-                continue
             raw = vals.get("raw")
-            if not raw and vals.get("datas"):
-                try:
-                    raw = base64.b64decode(vals["datas"])
-                except Exception:
-                    continue
-            if not raw:
-                continue
-            mimetype = vals.get("mimetype") or guess_mimetype(raw)
-            if mimetype not in ("image/jpeg", "image/png", "image/webp"):
-                continue  # videos, PDF, etc. no se tocan
-            new_raw = _compress_image(raw)
-            if new_raw is raw:
-                continue
-            vals.pop("datas", None)
-            vals["raw"] = new_raw
-            vals["mimetype"] = "image/jpeg"
-            if vals.get("name"):
-                vals["name"] = os.path.splitext(vals["name"])[0] + ".jpg"
+            if raw and not isinstance(raw, str):
+                self._compress_vals(vals, raw)
         return super().create(vals_list)
+
+    def _upload_file(self, file, create_vals):
+        # Las fotos subidas desde el formulario llegan aquí, no por create()
+        vals = dict(create_vals)
+        if vals.get("res_model") in _COMPRESS_MODELS and (
+            vals.get("mimetype") or ""
+        ).startswith("image/"):
+            raw = file.read()
+            if self._compress_vals(vals, raw):
+                return self.create(vals)
+            return self.create(dict(create_vals, raw=BinaryBytes(raw)))
+        return super()._upload_file(file, create_vals)

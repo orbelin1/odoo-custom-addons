@@ -1,5 +1,3 @@
-import base64
-
 from odoo import http
 from odoo.http import request
 from werkzeug.wrappers import Response
@@ -17,7 +15,7 @@ class ServicioInspeccionVideoController(http.Controller):
         attachment = request.env["ir.attachment"].browse(attachment_id).exists()
         if not attachment or not attachment.mimetype.startswith("video/"):
             return request.not_found()
-        content = base64.b64decode(attachment.datas or b"")
+        content = bytes(attachment.raw or b"")
         return Response(
             content,
             headers=[

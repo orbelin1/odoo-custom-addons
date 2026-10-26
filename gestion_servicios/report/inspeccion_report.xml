@@ -35,7 +35,7 @@
                 </div>
             </t>
             <t t-else="">
-                <div class="att-file">Archivo adjunto: <t t-esc="att.name"/></div>
+                <div class="att-file">Archivo adjunto: <t t-out="att.name"/></div>
             </t>
         </t>
     </template>
@@ -53,7 +53,7 @@
             <t t-foreach="items" t-as="item">
                 <tbody>
                     <tr>
-                        <td><t t-esc="item.question_short"/></td>
+                        <td><t t-out="item.question_short"/></td>
                         <td>
                             <t t-if="item.answer_type == 'rating'">
                                 <span t-field="item.rating"/>
@@ -66,25 +66,19 @@
                     </tr>
                     <tr t-if="item.attachment_ids">
                         <td colspan="3">
-                            <t t-call="gestion_servicios.report_inspeccion_attachments">
-                                <t t-set="attachments" t-value="item.attachment_ids"/>
-                            </t>
+                            <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="item.attachment_ids"/>
                         </td>
                     </tr>
                     <tr t-if="item.attachment_before_ids">
                         <td colspan="3">
                             <div class="att-label">Fotos ANTES</div>
-                            <t t-call="gestion_servicios.report_inspeccion_attachments">
-                                <t t-set="attachments" t-value="item.attachment_before_ids"/>
-                            </t>
+                            <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="item.attachment_before_ids"/>
                         </td>
                     </tr>
                     <tr t-if="item.attachment_after_ids">
                         <td colspan="3">
                             <div class="att-label">Fotos DESPUÉS</div>
-                            <t t-call="gestion_servicios.report_inspeccion_attachments">
-                                <t t-set="attachments" t-value="item.attachment_after_ids"/>
-                            </t>
+                            <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="item.attachment_after_ids"/>
                         </td>
                     </tr>
                 </tbody>
@@ -94,15 +88,13 @@
 
     <!-- Cuadro de texto + nota + archivos (secciones 6, 7 y 8) -->
     <template id="report_inspeccion_textblock">
-        <div class="insp-q"><t t-esc="question"/></div>
+        <div class="insp-q"><t t-out="question"/></div>
         <div class="insp-box" style="white-space: pre-wrap;"><t t-out="text_value"/></div>
         <div t-if="note_value" class="insp-note">
             <strong>Nota:</strong> <span style="white-space: pre-wrap;"><t t-out="note_value"/></span>
         </div>
         <t t-if="attach_value">
-            <t t-call="gestion_servicios.report_inspeccion_attachments">
-                <t t-set="attachments" t-value="attach_value"/>
-            </t>
+            <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="attach_value"/>
         </t>
     </template>
 
@@ -165,65 +157,40 @@
                     <!-- 3 -->
                     <div class="insp-h">3. Inspección a sistemas de alarmas y detección de incendios</div>
                     <t t-foreach="grouped(o, 'alarm_inspection')" t-as="grp">
-                        <div class="insp-sub"><t t-esc="grp[0]"/></div>
-                        <t t-call="gestion_servicios.report_inspeccion_items">
-                            <t t-set="items" t-value="grp[1]"/>
-                        </t>
+                        <div class="insp-sub"><t t-out="grp[0]"/></div>
+                        <t t-call="gestion_servicios.report_inspeccion_items" items="grp[1]"/>
                     </t>
 
                     <!-- 4 -->
                     <div class="insp-h">4. Inspección de asistencia de protección contra incendios</div>
                     <t t-foreach="grouped(o, 'fire_protection')" t-as="grp">
-                        <div class="insp-sub"><t t-esc="grp[0]"/></div>
-                        <t t-call="gestion_servicios.report_inspeccion_items">
-                            <t t-set="items" t-value="grp[1]"/>
-                        </t>
+                        <div class="insp-sub"><t t-out="grp[0]"/></div>
+                        <t t-call="gestion_servicios.report_inspeccion_items" items="grp[1]"/>
                     </t>
 
                     <!-- 5 -->
                     <div class="insp-h">5. Inspección a sistemas de supresión de incendios de cocina (ANSUL)</div>
-                    <t t-call="gestion_servicios.report_inspeccion_items">
-                        <t t-set="items" t-value="section_items(o, 'kitchen_suppression')"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_items" items="section_items(o, 'kitchen_suppression')"/>
 
                     <!-- 6 -->
                     <div class="insp-h">6. Observaciones generales de servicio</div>
-                    <t t-call="gestion_servicios.report_inspeccion_textblock">
-                        <t t-set="question" t-value="'A manera de resumen, enliste las deficiencias encontradas en los sistemas.'"/>
-                        <t t-set="text_value" t-value="o.observations_text"/>
-                        <t t-set="note_value" t-value="o.observations_note"/>
-                        <t t-set="attach_value" t-value="o.observations_attachment_ids"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_textblock" question="'A manera de resumen, enliste las deficiencias encontradas en los sistemas.'" text_value="o.observations_text" note_value="o.observations_note" attach_value="o.observations_attachment_ids"/>
 
                     <!-- 7 -->
                     <div class="insp-h">7. Conclusión y recomendaciones del servicio</div>
-                    <t t-call="gestion_servicios.report_inspeccion_textblock">
-                        <t t-set="question" t-value="'Enliste las recomendaciones generales para los sistemas revisados durante la visita.'"/>
-                        <t t-set="text_value" t-value="o.recommendations_text"/>
-                        <t t-set="note_value" t-value="o.recommendations_note"/>
-                        <t t-set="attach_value" t-value="o.recommendations_attachment_ids"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_textblock" question="'Enliste las recomendaciones generales para los sistemas revisados durante la visita.'" text_value="o.recommendations_text" note_value="o.recommendations_note" attach_value="o.recommendations_attachment_ids"/>
 
                     <!-- 8 -->
                     <div class="insp-h">8. Equipo o sistema quedan en</div>
-                    <t t-call="gestion_servicios.report_inspeccion_textblock">
-                        <t t-set="question" t-value="'Describir en qué estado quedan los equipos o sistemas.'"/>
-                        <t t-set="text_value" t-value="o.equipment_status_text"/>
-                        <t t-set="note_value" t-value="o.equipment_status_note"/>
-                        <t t-set="attach_value" t-value="o.equipment_status_attachment_ids"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_textblock" question="'Describir en qué estado quedan los equipos o sistemas.'" text_value="o.equipment_status_text" note_value="o.equipment_status_note" attach_value="o.equipment_status_attachment_ids"/>
 
                     <!-- 9 -->
                     <div class="insp-h">9. Capacitación</div>
-                    <t t-call="gestion_servicios.report_inspeccion_items">
-                        <t t-set="items" t-value="section_items(o, 'training')"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_items" items="section_items(o, 'training')"/>
 
                     <!-- 10 -->
                     <div class="insp-h">10. Evaluación por parte del cliente</div>
-                    <t t-call="gestion_servicios.report_inspeccion_items">
-                        <t t-set="items" t-value="section_items(o, 'customer_evaluation')"/>
-                    </t>
+                    <t t-call="gestion_servicios.report_inspeccion_items" items="section_items(o, 'customer_evaluation')"/>
 
                     <!-- 11 -->
                     <div class="insp-h">11. Recibido por</div>
@@ -255,18 +222,14 @@
                         <strong>Nota:</strong> <span t-field="o.received_note"/>
                     </div>
                     <t t-if="o.received_attachment_ids">
-                        <t t-call="gestion_servicios.report_inspeccion_attachments">
-                            <t t-set="attachments" t-value="o.received_attachment_ids"/>
-                        </t>
+                        <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="o.received_attachment_ids"/>
                     </t>
 
                     <t t-if="o.notes or o.attachment_ids">
                         <div class="insp-h">Observaciones generales del servicio</div>
                         <div t-if="o.notes" class="insp-box"><span t-field="o.notes"/></div>
                         <t t-if="o.attachment_ids">
-                            <t t-call="gestion_servicios.report_inspeccion_attachments">
-                                <t t-set="attachments" t-value="o.attachment_ids"/>
-                            </t>
+                            <t t-call="gestion_servicios.report_inspeccion_attachments" attachments="o.attachment_ids"/>
                         </t>
                     </t>
 
